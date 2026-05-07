@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kleur Sorteermachine | Kiara Ballesteros</title>
+
+    <link rel="stylesheet" href="stylesheet.css">
+    <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Rubik:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <!-- NAV -->
+    <header class="nav">
+        <div class="container nav-content">
+            <h1 class="logo">Kiara <span>Ballesteros.</span></h1>
+
+            <nav>
+                <a href="index.html">Home</a>
+                <a href="index.html#over">Over mij</a>
+                <a href="index.html#projecten" class="active">Projecten</a>
+                <a href="blog.html">Blog/Nieuws</a>
+                <a href="index.html#contact">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+
+        <!-- HERO -->
+        <section class="hero">
+            <div class="container hero-content">
+
+                <div class="hero-text">
+                    <h2>Kleur Sorteermachine</h2>
+                    <hr>
+                    <p>
+                        Een automatische machine die legoblokjes sorteert op kleur,
+                        ontworpen voor kleurenblinde gebruikers.
+                    </p>
+
+                    <div class="skill-tags project-tags">
+                        <span class="tag orange">Elektronica</span>
+                        <span class="tag grey">C++</span>
+                        <span class="tag grey">Arduino</span>
+                    </div>
+                </div>
+
+                <img src="img/kleursorteermachine1.png" alt="Kleur sorteermachine" class="project-hero-img">
+
+            </div>
+        </section>
+
+        <!-- INFO -->
+        <section class="about">
+            <div class="container about-content">
+
+                <div>
+                    <h2>Projectinformatie</h2>
+                    <p><strong>Rol:</strong> Ontwerp & programmering</p>
+                    <p><strong>Context:</strong> GIP 2024–2025</p>
+                    <p><strong>Doel:</strong> Ondersteuning voor kleurenblinde gebruikers</p>
+                </div>
+
+                <div class="skills">
+                    <h3>Gebruikte technologie</h3>
+                    <div class="skill-tags">
+                        <span class="tag grey">Arduino UNO</span>
+                        <span class="tag grey">TCS34725</span>
+                        <span class="tag grey">SG90 Servo</span>
+                        <span class="tag grey">IR Sensor KY-032</span>
+                        <span class="tag grey">DC Gearmotor</span>
+                        <span class="tag grey">Motor Driver L298N</span>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- WERKING -->
+        <section class="projects">
+            <div class="container">
+                <h2>Werking van de machine</h2>
+
+                <p>
+                    De machine sorteert legoblokjes automatisch op basis van kleur.
+                    Via vibrerende V-kanalen worden de blokjes één per één naar een
+                    transportband geleid. Een kleurensensor detecteert de kleur,
+                    waarna een servomotor het blokje naar het juiste bakje stuurt.
+                </p>
+
+                <p class="mt-15">
+                    Het systeem wordt aangestuurd door een Arduino UNO en maakt gebruik
+                    van meerdere motoren en sensoren om nauwkeurig en betrouwbaar te werken.
+                </p>
+            </div>
+        </section>
+
+        <!-- CODE -->
+        <section class="code-section">
+            <div class="container">
+                <h2>Code</h2>
+                <p class="subtitle">
+                    Arduino-code voor kleurdetectie en aansturing
+                </p>
+
+                <pre class="code-block"><code>
+                    #include &lt;Wire.h&gt;
+                    #include &lt;Adafruit_TCS34725.h&gt;
+                    #include &lt;Servo.h&gt;
+
+                    Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_600MS, TCS34725_GAIN_1X);
+                    Servo myServo;
+
+                    #define ENA 3
+                    #define IN1 2
+                    #define IN2 4
+
+                    const int TOLERANTIE = 12;
+
+                    const int WAARDEROODR = 180;
+                    const int WAARDEROODG = 44;
+                    const int WAARDEROODB = 46;
+
+                    const int WAARDEBLAUWR = 30;
+                    const int WAARDEBLAUWG = 86;
+                    const int WAARDEBLAUWB = 139;
+
+                    const int WAARDEGROENR = 50;
+                    const int WAARDEGROENG = 131;
+                    const int WAARDEGROENB = 63;
+
+                    const int WAARDEGEELR = 101;
+                    const int WAARDEGEELG = 98;
+                    const int WAARDEGEELB = 43;
+
+                    const int WAARDEORANJER = 157;
+                    const int WAARDEORANJEG = 54;
+                    const int WAARDEORANJEB = 36;
+
+                    void setup() {
+                        Serial.begin(9600);
+
+                        if (!tcs.begin()) {
+                            Serial.println("Kleursensor niet gevonden.");
+                            while (1);
+                        }
+
+                        myServo.attach(9);
+                        myServo.write(90);
+
+                        pinMode(IN1, OUTPUT);
+                        pinMode(IN2, OUTPUT);
+                        pinMode(ENA, OUTPUT);
+
+                        digitalWrite(IN1, HIGH);
+                        digitalWrite(IN2, LOW);
+                        analogWrite(ENA, 200);
+                    }
+
+                    void loop() {
+                        uint16_t r, g, b, c;
+                        float red, green, blue;
+
+                        tcs.getRawData(&r, &g, &b, &c);
+
+                        red   = r / (float)c * 255.0;
+                        green = g / (float)c * 255.0;
+                        blue  = b / (float)c * 255.0;
+
+                        if (red >= WAARDEROODR - TOLERANTIE &&
+                            red <= WAARDEROODR + TOLERANTIE &&
+                            green >= WAARDEROODG - TOLERANTIE &&
+                            green <= WAARDEROODG + TOLERANTIE &&
+                            blue >= WAARDEROODB - TOLERANTIE &&
+                            blue <= WAARDEROODB + TOLERANTIE) {
+
+                            myServo.write(0); // Rood
+                        }
+                    }
+                </code></pre>
+            </div>
+        </section>
+        <!-- IMAGES -->
+        <section class="projects">
+            <div class="container">
+                <h2>Ontwerp & schema’s</h2>
+
+                <div class="project-images">
+                    <img src="img/schema.png" alt="Schema">
+                    <img src="img/breadboard.png" alt="Breadboard">
+                    <img src="img/kleursorteermachine1.png" alt="Machine">
+                </div>
+            </div>
+        </section>
+        <!-- TERUG -->
+        <section class="back-btn-container-l">
+            <div class="container">
+                <a href="index.html#projecten" class="btn">← Terug naar projecten</a>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <p class="footer-text">© 2026 Kiara Ballesteros. All rights reserved</p>
+    </footer>
+</body>
+</html>
